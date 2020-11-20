@@ -75,6 +75,9 @@ func onReady() {
 			fmt.Printf("%#+v\n", projects)
 
 			for _, project := range projects.Projects {
+				if _, exclude := Find(config.Exclude, project.Name); exclude {
+					continue
+				}
 				item := items[project.Name]
 				if item == nil {
 					item = systray.AddMenuItem(project.Name, project.Name)
@@ -114,4 +117,13 @@ func onReady() {
 			}
 		}
 	}()
+}
+
+func Find(slice []string, val string) (int, bool) {
+	for i, item := range slice {
+		if item == val {
+			return i, true
+		}
+	}
+	return -1, false
 }
