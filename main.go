@@ -107,17 +107,24 @@ func onReady() {
 				}
 
 				// Activity:"Sleeping", LastBuildStatus:"Success"
+				status := "⬤"
 				if project.LastBuildStatus == "Success" {
+					status = "🟢"
 					item.SetTemplateIcon(greenICO, greenICO)
 					if allStatus < 1 {
 						allStatus = 1
 					}
 				} else if project.LastBuildStatus == "Failure" {
+					status = "🔴"
 					item.SetTemplateIcon(redICO, redICO)
 					if allStatus < 2 {
 						allStatus = 2
 					}
 				}
+				if project.Activity != "Sleeping" {
+					status = fmt.Sprintf("%s%s", status, "↻")
+				}
+				item.SetTitle(fmt.Sprintf("%s %s", status, project.Name))
 			}
 		}
 
