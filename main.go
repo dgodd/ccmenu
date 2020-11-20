@@ -4,7 +4,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"github.com/getlantern/systray"
-	"github.com/getlantern/systray/example/icon"
+	// "github.com/getlantern/systray/example/icon"
 	"github.com/skratchdot/open-golang/open"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
@@ -33,7 +33,7 @@ func main() {
 }
 
 func onReady() {
-	systray.SetTemplateIcon(icon.Data, icon.Data)
+	// systray.SetTemplateIcon(icon.Data, icon.Data)
 	systray.SetTitle("CC")
 	systray.SetTooltip("CC Menu COPY")
 	mQuitOrig := systray.AddMenuItem("Quit", "Quit the whole app")
@@ -58,6 +58,7 @@ func onReady() {
 			panic(err)
 		}
 
+		allStatus := 0
 		for _, config := range configs {
 			fmt.Println(config)
 			resp, err := http.Get(config.URL)
@@ -95,12 +96,25 @@ func onReady() {
 				// Activity:"Sleeping", LastBuildStatus:"Success"
 				if project.LastBuildStatus == "Success" {
 					status = "🟢"
+					if allStatus < 1 {
+						allStatus = 1
+					}
 				} else if project.LastBuildStatus == "Failure" {
 					status = "🔴"
+					if allStatus < 2 {
+						allStatus = 2
+					}
 				}
 				item.SetTitle(fmt.Sprintf("%s %s", status, project.Name))
 				// item.SetTemplateIcon(icon.Data, icon.Data)
 			}
+		}
+
+		switch allStatus {
+		case 0:
+			systray.SetTitle("🟢 CC")
+		case 1:
+			systray.SetTitle("🔴 CC")
 		}
 	}
 	getData()
