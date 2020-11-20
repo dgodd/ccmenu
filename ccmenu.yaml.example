@@ -1,0 +1,4 @@
+- url: https://cc.buildkite.com/ORG.xml?access_token=XXXXX
+  exclude:
+  - name1
+  - name2
