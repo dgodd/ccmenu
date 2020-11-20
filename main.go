@@ -33,9 +33,22 @@ func main() {
 }
 
 func onReady() {
-	// systray.SetTemplateIcon(icon.Data, icon.Data)
+	greyICO, err := ioutil.ReadFile("/home/dgodd/workspace/ccmenu/grey.png")
+	if err != nil {
+		panic(err)
+	}
+	greenICO, err := ioutil.ReadFile("/home/dgodd/workspace/ccmenu/green.png")
+	if err != nil {
+		panic(err)
+	}
+	redICO, err := ioutil.ReadFile("/home/dgodd/workspace/ccmenu/red.png")
+	if err != nil {
+		panic(err)
+	}
+
+	systray.SetTemplateIcon(greyICO, greyICO)
 	systray.SetTitle("CC")
-	systray.SetTooltip("CC Menu COPY")
+	// systray.SetTooltip("CC Menu COPY")
 	mQuitOrig := systray.AddMenuItem("Quit", "Quit the whole app")
 	ticker := time.NewTicker(10 * time.Second)
 
@@ -73,15 +86,16 @@ func onReady() {
 			if err != nil {
 				panic(err)
 			}
-			fmt.Printf("%#+v\n", projects)
 
 			for _, project := range projects.Projects {
+				fmt.Printf("%s - %s - %s\n", project.Name, project.LastBuildStatus, project.Activity)
 				if _, exclude := Find(config.Exclude, project.Name); exclude {
 					continue
 				}
 				item := items[project.Name]
 				if item == nil {
 					item = systray.AddMenuItem(project.Name, project.Name)
+					item.SetTemplateIcon(greyICO, greyICO)
 					url := project.WebURL
 					go func() {
 						for {
@@ -92,29 +106,26 @@ func onReady() {
 					items[project.Name] = item
 				}
 
-				status := "⬤"
 				// Activity:"Sleeping", LastBuildStatus:"Success"
 				if project.LastBuildStatus == "Success" {
-					status = "🟢"
+					item.SetTemplateIcon(greenICO, greenICO)
 					if allStatus < 1 {
 						allStatus = 1
 					}
 				} else if project.LastBuildStatus == "Failure" {
-					status = "🔴"
+					item.SetTemplateIcon(redICO, redICO)
 					if allStatus < 2 {
 						allStatus = 2
 					}
 				}
-				item.SetTitle(fmt.Sprintf("%s %s", status, project.Name))
-				// item.SetTemplateIcon(icon.Data, icon.Data)
 			}
 		}
 
 		switch allStatus {
 		case 0:
-			systray.SetTitle("🟢 CC")
+			systray.SetTemplateIcon(greenICO, greenICO)
 		case 1:
-			systray.SetTitle("🔴 CC")
+			systray.SetTemplateIcon(redICO, redICO)
 		}
 	}
 	getData()
